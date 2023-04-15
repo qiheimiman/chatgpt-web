@@ -1,6 +1,5 @@
 import express from 'express'
 import type { RequestProps } from './types'
-import type { ChatMessage } from './chatgpt'
 import { chatConfig, chatReplyProcess, currentModel } from './chatgpt'
 import { auth } from './middleware/auth'
 import { limiter } from './middleware/limiter'
@@ -24,18 +23,20 @@ router.post('/chat-process', [auth, limiter], async (req, res) => {
 
   try {
     const { prompt, options = {}, systemMessage, temperature, top_p } = req.body as RequestProps
-    let firstChunk = true
-    await chatReplyProcess({
+    // let firstChunk = true
+    const reponse1 = await chatReplyProcess({
       message: prompt,
       lastContext: options,
-      process: (chat: ChatMessage) => {
-        res.write(firstChunk ? JSON.stringify(chat) : `\n${JSON.stringify(chat)}`)
-        firstChunk = false
-      },
+      // process: (chat: ChatMessage) => {
+      //   res.write(firstChunk ? JSON.stringify(chat) : `\n${JSON.stringify(chat)}`)
+      //   firstChunk = false
+      // },
       systemMessage,
       temperature,
       top_p,
     })
+
+    res.write(JSON.stringify(reponse1))
   }
   catch (error) {
     res.write(JSON.stringify(error))
